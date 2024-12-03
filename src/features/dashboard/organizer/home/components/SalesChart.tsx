@@ -30,7 +30,9 @@ const SalesChart = () => {
   ];
 
   return (
-    <ChartContainer config={chartConfig} className="min-h-[200px] w-full pt-8">
+    <ChartContainer
+      config={chartConfig}
+      className="min-h-[200px] h-full w-full py-8">
       <BarChart accessibilityLayer data={monthlyChart}>
         <CartesianGrid vertical={false} className="stroke-black" />
         <ChartTooltip content={<ChartTooltipContent />} />
