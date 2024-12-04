@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -14,6 +13,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
+import * as React from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -21,7 +21,6 @@ import {
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -43,55 +42,112 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import Link from "next/link";
 
-export type Payment = {
+export type Transaction = {
   id: string;
-  name: string;
-  date: Date;
-  venue: string;
-  price: number;
-  seats: number;
-  totalSeats: number;
+  status: string;
+  userId: string;
+  eventId: string;
+  quantity: number;
+  total: number;
+  createdAt: Date;
+  paymentProof: string;
 };
 
 const calculateRevenue = (price: number, seats: number): number => {
   return price * seats;
 };
 
-const data: Payment[] = [
+const data: Transaction[] = [
   {
-    id: "m5gr84i9",
-    name: "JogjaRockArta",
-    date: new Date("2024-02-01"),
-    venue: "Prambanan Parking Field, YK",
-    price: 150000,
-    seats: 50,
-    totalSeats: 100,
-  },
-  {
-    id: "asd17sh2",
-    name: "Nine Indie Concert",
-    date: new Date("2024-02-31"),
-    venue: "Taman Budaya Yogyakarta, YK",
-    price: 250000,
-    seats: 70,
-    totalSeats: 90,
+    id: "as7f%ah",
+    status: "unpaid",
+    userId: "pas09*I$",
+    eventId: "asd17sh2",
+    quantity: 5,
+    total: 1250000,
+    createdAt: new Date("2024-05-10"),
+    paymentProof:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/ReceiptSwiss.jpg/1200px-ReceiptSwiss.jpg",
   },
 ];
 
-export const columns: ColumnDef<Payment>[] = [
+export const columns: ColumnDef<Transaction>[] = [
   {
     accessorKey: "id",
     header: "ID",
     cell: ({ row }) => <div className="capitalize">{row.getValue("id")}</div>,
   },
   {
-    accessorKey: "name",
-    header: "Name",
-    cell: ({ row }) => <div className="capitalize">{row.getValue("name")}</div>,
+    accessorKey: "status",
+    header: "Status",
+    cell: ({ row }) => (
+      <div className="capitalize">
+        <span className="bg-red-300 rounded-full text-red-700 font-semibold py-2 px-4">
+          {row.getValue("status")}
+        </span>
+      </div>
+    ),
   },
   {
-    accessorKey: "date",
+    accessorKey: "userId",
+    header: "Customer ID",
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue("userId")}</div>
+    ),
+  },
+  {
+    accessorKey: "eventId",
+    header: "Event ID",
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue("eventId")}</div>
+    ),
+  },
+  {
+    accessorKey: "quantity",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          className="px-2 truncate max-w-[90px]"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+          qty
+          <ArrowUpDown />
+        </Button>
+      );
+    },
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue("quantity")}</div>
+    ),
+  },
+  {
+    accessorKey: "total",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          className="px-2"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+          Total
+          <ArrowUpDown />
+        </Button>
+      );
+    },
+    cell: ({ row }) => {
+      const totalPrice = row.original.total;
+      return (
+        <div>
+          {totalPrice.toLocaleString("id-ID", {
+            style: "currency",
+            currency: "IDR",
+          })}
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "createdAt",
     header: ({ column }) => {
       return (
         <Button
@@ -104,7 +160,7 @@ export const columns: ColumnDef<Payment>[] = [
       );
     },
     cell: ({ row }) => {
-      const dateValue = new Date(row.getValue("date")); // Parse the ISO string into a Date object
+      const dateValue = new Date(row.getValue("createdAt")); // Parse the ISO string into a Date object
       const formattedDate = new Intl.DateTimeFormat("en-ID", {
         dateStyle: "full",
         timeStyle: "short",
@@ -114,70 +170,15 @@ export const columns: ColumnDef<Payment>[] = [
     },
   },
   {
-    accessorKey: "venue",
-    header: "Venue",
+    accessorKey: "paymentProof",
+    header: "Payment Proof",
     cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("venue")}</div>
+      <div className="truncate max-w-[250px]">
+        <Link target="_blank" href={row.original.paymentProof}>
+          {row.getValue("paymentProof")}
+        </Link>
+      </div>
     ),
-  },
-  {
-    accessorKey: "revenue",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          className="px-2"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-          Revenue
-          <ArrowUpDown />
-        </Button>
-      );
-    },
-    cell: ({ row }) => {
-      const price = Number(row.original.price);
-      const seats = Number(row.getValue<number>("seats"));
-      return (
-        <div>
-          {calculateRevenue(price, seats).toLocaleString("id-ID", {
-            style: "currency",
-            currency: "IDR",
-          })}
-        </div>
-      );
-    },
-    sortingFn: (a, b) => {
-      const revenueA = calculateRevenue(a.original.price, a.original.seats);
-      const revenueB = calculateRevenue(b.original.price, b.original.seats);
-      return revenueA - revenueB; // Ascending order
-    },
-  },
-  {
-    accessorKey: "seats",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          className="px-2"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-          Seats
-          <ArrowUpDown />
-        </Button>
-      );
-    },
-    cell: ({ row }) => {
-      const seats = row.getValue<number>("seats");
-      const totalSeats = row.original.totalSeats; // Access totalSeats directly from the row's original data.
-      return (
-        <div className="lowercase">
-          {seats} / {totalSeats}
-        </div>
-      );
-    },
-    sortingFn: (rowA, rowB) => {
-      const diffA = Math.abs(rowA.original.seats - rowA.original.totalSeats);
-      const diffB = Math.abs(rowB.original.seats - rowB.original.totalSeats);
-      return diffA - diffB; // Sort by the smallest difference first
-    },
   },
   {
     accessorKey: "actions",
@@ -196,11 +197,11 @@ export const columns: ColumnDef<Payment>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuItem
               onClick={() => navigator.clipboard.writeText(payment.id)}>
-              Copy payment ID
+              Copy transaction ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>View Detail</DropdownMenuItem>
-            <DropdownMenuItem>Edit Event</DropdownMenuItem>
+            <DropdownMenuItem>Edit Transaction</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       );
@@ -208,7 +209,7 @@ export const columns: ColumnDef<Payment>[] = [
   },
 ];
 
-const EventTable = () => {
+const TransactionsTable = () => {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -217,7 +218,7 @@ const EventTable = () => {
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
   const [globalFilter, setGlobalFilter] = React.useState("");
-  const [selectedTime, setSelectedTime] = React.useState("all-event");
+  const [selectedTime, setSelectedTime] = React.useState("all");
 
   const table = useReactTable({
     data,
@@ -247,7 +248,7 @@ const EventTable = () => {
   return (
     <div className="w-full">
       <div className="w-full flex items-center justify-between py-4">
-        <p className="text-2xl font-semibold">120 Events</p>
+        <p className="text-2xl font-semibold">200 Transactions</p>
         <div className="flex items-center gap-4">
           <Input
             placeholder="Search..."
@@ -286,10 +287,11 @@ const EventTable = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
-                <SelectItem value="all-event">All Event</SelectItem>
-                <SelectItem value="sold-out">Sold Out</SelectItem>
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="inactive">Inactive</SelectItem>
+                <SelectItem value="all">All</SelectItem>
+                <SelectItem value="unpaid">Unpaid</SelectItem>
+                <SelectItem value="processing">Processing</SelectItem>
+                <SelectItem value="paid">Paid</SelectItem>
+                <SelectItem value="failed">Failed</SelectItem>
               </SelectGroup>
             </SelectContent>
           </Select>
@@ -375,4 +377,4 @@ const EventTable = () => {
   );
 };
 
-export default EventTable;
+export default TransactionsTable;
