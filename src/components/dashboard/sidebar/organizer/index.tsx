@@ -53,17 +53,7 @@ const items = [
     subitems: [
       {
         title: "Transaction List",
-        url: "/dashboard/organizer/1/referral-list",
-      },
-    ],
-  },
-  {
-    title: "Referrals",
-    icon: Ticket,
-    subitems: [
-      {
-        title: "Referral List",
-        url: "/dashboard/organizer/1/referral-list",
+        url: "/dashboard/organizer/1/transactions-list",
       },
     ],
   },
@@ -73,7 +63,7 @@ const items = [
     subitems: [
       {
         title: "Voucher List",
-        url: "/dashboard/organizer/1/voucher-list",
+        url: "/dashboard/organizer/1/vouchers-list",
       },
       {
         title: "Create Voucher",
