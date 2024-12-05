@@ -41,10 +41,6 @@ const items = [
         title: "Event List",
         url: "/dashboard/organizer/1/event-list",
       },
-      {
-        title: "Create Event",
-        url: "/dashboard/organizer/1/create-event",
-      },
     ],
   },
   {
