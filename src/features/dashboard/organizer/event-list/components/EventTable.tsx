@@ -27,21 +27,31 @@ import {
 } from "@/components/ui/table";
 import globalFilterFn from "@/utils/globalFilterFn";
 import {
-  Column,
   ColumnDef,
-  ColumnFiltersState,
+  useReactTable,
   SortingState,
+  ColumnFiltersState,
   VisibilityState,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  useReactTable,
 } from "@tanstack/react-table";
 import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
 import Link from "next/link";
-import { FC, useState } from "react";
+import { FC, useState, useEffect } from "react";
+
+interface EventType {
+  id: number;
+  category: { name: string };
+  title: string;
+  startDate: string;
+  endDate: string;
+  city: { name: string };
+  price: number;
+  availableSeats: number;
+}
 
 interface EventTableInterface {
   data: EventType[];
@@ -51,12 +61,13 @@ interface EventTableInterface {
 const columns: ColumnDef<EventType>[] = [
   {
     accessorKey: "id",
-    header: "ID",
+    header: ({ column }) => <SortableHeaderButton column={column} label="ID" />,
     cell: ({ row }) => <div className="capitalize">{row.getValue("id")}</div>,
   },
   {
-    accessorKey: "category",
+    accessorKey: "categoryName",
     header: "Category",
+    accessorFn: (row) => row.category.name,
     cell: ({ row }) => (
       <div className="capitalize">{row.original.category.name}</div>
     ),
@@ -121,8 +132,7 @@ const SortableHeaderButton: FC<{ column: any; label: string }> = ({
     variant="ghost"
     className="px-2"
     onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-    {label}
-    <ArrowUpDown />
+    {label} <ArrowUpDown />
   </Button>
 );
 
@@ -132,7 +142,6 @@ const DateCell: FC<{ date: string }> = ({ date }) => {
     timeStyle: "short",
     timeZone: "Asia/Jakarta",
   }).format(new Date(date));
-
   return <div className="capitalize">{formattedDate}</div>;
 };
 
@@ -163,25 +172,19 @@ const EventTable: FC<EventTableInterface> = ({ data, isLoading }) => {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [globalFilter, setGlobalFilter] = useState("");
-  const [selectedTime, setSelectedTime] = useState("all-event");
 
   const table = useReactTable({
     data,
     columns,
+    state: { sorting, columnFilters, columnVisibility, globalFilter },
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
+    onColumnVisibilityChange: setColumnVisibility,
+    globalFilterFn: globalFilterFn,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
-    state: {
-      sorting,
-      columnFilters,
-      columnVisibility,
-      globalFilter,
-    },
-    globalFilterFn: globalFilterFn,
+    getPaginationRowModel: getPaginationRowModel(),
   });
 
   return (
@@ -192,10 +195,8 @@ const EventTable: FC<EventTableInterface> = ({ data, isLoading }) => {
         globalFilter={globalFilter}
         setGlobalFilter={setGlobalFilter}
         table={table}
-        selectedTime={selectedTime}
-        setSelectedTime={setSelectedTime}
       />
-      <TableSection table={table} isLoading={isLoading} columns={columns} />
+      <TableSection table={table} isLoading={isLoading} />
       <PaginationControls table={table} />
     </div>
   );
@@ -207,29 +208,51 @@ const HeaderSection: FC<{
   globalFilter: string;
   setGlobalFilter: (value: string) => void;
   table: any;
-  selectedTime: string;
-  setSelectedTime: (value: string) => void;
-}> = ({
-  isLoading,
+}> = ({ isLoading, data, globalFilter, setGlobalFilter, table }) => {
+  const categories = Array.from(
+    new Set(data.map((event) => event.category.name))
+  );
+
+  return (
+    <div className="w-full flex items-center justify-between py-4">
+      <p className="text-2xl font-semibold">
+        {isLoading ? "Loading events..." : `${data.length} Events`}
+      </p>
+      <div className="flex items-center gap-4">
+        <Input
+          placeholder="Search..."
+          value={globalFilter}
+          onChange={(e) => setGlobalFilter(e.target.value)}
+          className="max-w-sm w-[300px]"
+        />
+        <ColumnVisibilityDropdown table={table} />
+        <TimeCategoryFilters data={data} table={table} />
+      </div>
+    </div>
+  );
+};
+
+const TimeCategoryFilters: FC<{ data: EventType[]; table: any }> = ({
   data,
-  globalFilter,
-  setGlobalFilter,
   table,
-  selectedTime,
-  setSelectedTime,
-}) => (
-  <div className="w-full flex items-center justify-between py-4">
-    <p className="text-2xl font-semibold">
-      {isLoading ? "Loading events..." : `${data.length} Events`}
-    </p>
-    <div className="flex items-center gap-4">
-      <Input
-        placeholder="Search..."
-        value={globalFilter}
-        onChange={(event) => setGlobalFilter(event.target.value)}
-        className="max-w-sm w-[300px]"
-      />
-      <ColumnVisibilityDropdown table={table} />
+}) => {
+  const [selectedTime, setSelectedTime] = useState("all-event");
+  const [selectedCategory, setSelectedCategory] = useState("all");
+
+  const categories = Array.from(
+    new Set(data.map((event) => event.category.name))
+  );
+
+  useEffect(() => {
+    const newFilters =
+      selectedCategory === "all"
+        ? []
+        : [{ id: "categoryName", value: selectedCategory }];
+    table.setColumnFilters(newFilters);
+  }, [selectedCategory, table]);
+
+  return (
+    <>
       <Select value={selectedTime} onValueChange={setSelectedTime}>
         <SelectTrigger className="w-[120px] text-black">
           <SelectValue placeholder="Select Time" />
@@ -243,12 +266,25 @@ const HeaderSection: FC<{
           </SelectGroup>
         </SelectContent>
       </Select>
-      <Button variant="outline" onClick={() => table.setSorting([])}>
-        Reset Sorting
-      </Button>
-    </div>
-  </div>
-);
+
+      <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+        <SelectTrigger className="w-[150px] text-black">
+          <SelectValue placeholder="All Categories" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectGroup>
+            <SelectItem value="all">All Categories</SelectItem>
+            {categories.map((category) => (
+              <SelectItem key={category} value={category}>
+                {category}
+              </SelectItem>
+            ))}
+          </SelectGroup>
+        </SelectContent>
+      </Select>
+    </>
+  );
+};
 
 const ColumnVisibilityDropdown: FC<{ table: any }> = ({ table }) => (
   <DropdownMenu>
@@ -261,7 +297,7 @@ const ColumnVisibilityDropdown: FC<{ table: any }> = ({ table }) => (
       {table
         .getAllColumns()
         .filter((column: any) => column.getCanHide())
-        .map((column: Column<EventType>) => (
+        .map((column: any) => (
           <DropdownMenuCheckboxItem
             key={column.id}
             className="capitalize"
@@ -274,11 +310,10 @@ const ColumnVisibilityDropdown: FC<{ table: any }> = ({ table }) => (
   </DropdownMenu>
 );
 
-const TableSection: FC<{
-  table: any;
-  isLoading: boolean;
-  columns: ColumnDef<EventType>[];
-}> = ({ table, isLoading, columns }) => (
+const TableSection: FC<{ table: any; isLoading: boolean }> = ({
+  table,
+  isLoading,
+}) => (
   <div className="rounded-md border">
     {isLoading ? (
       <div className="p-6 text-center">Loading...</div>
@@ -293,7 +328,7 @@ const TableSection: FC<{
                     ? null
                     : flexRender(
                         header.column.columnDef.header,
-                        header.getContext() // Correctly access the context for header rendering
+                        header.getContext()
                       )}
                 </TableHead>
               ))}
