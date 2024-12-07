@@ -46,8 +46,8 @@ interface EventType {
   id: number;
   category: { name: string };
   title: string;
-  startDate: string;
-  endDate: string;
+  startDate: Date;
+  endDate: Date;
   city: { name: string };
   price: number;
   availableSeats: number;
