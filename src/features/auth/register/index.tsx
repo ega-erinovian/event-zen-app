@@ -40,7 +40,7 @@ const RegisterComponent = () => {
       <Card className="w-[600px]">
         <CardHeader>
           <CardTitle className="capitalize text-2xl">
-            Create an {role} Account
+            Create {role} Account
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -88,59 +88,66 @@ const RegisterComponent = () => {
                 <Input id="phone-number" placeholder="+628xxxxxxxxx" />
               </div>
 
-              {/* Country Selection */}
-              <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="country">Country</Label>
-                <Select
-                  value={selectedCountry}
-                  onValueChange={(value) => setSelectedCountry(value)}>
-                  <SelectTrigger className="w-full text-black">
-                    <SelectValue placeholder="Select Country" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      {countries.map((country) => (
-                        <SelectItem key={country.id} value={country.name}>
-                          {country.name}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
+              <div className="grid grid-cols-2 gap-4">
+                {/* Country Selection */}
+                <div className="flex flex-col space-y-1.5">
+                  <Label htmlFor="country">Country</Label>
+                  <Select
+                    value={selectedCountry}
+                    onValueChange={(value) => setSelectedCountry(value)}>
+                    <SelectTrigger className="w-full text-black">
+                      <SelectValue placeholder="Select Country" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        {countries.map((country) => (
+                          <SelectItem key={country.id} value={country.name}>
+                            {country.name}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* City Selection */}
+                <div className="flex flex-col space-y-1.5">
+                  <Label htmlFor="city">City</Label>
+                  <Select
+                    value={selectedCity}
+                    onValueChange={(value) => setSelectedCity(value)}
+                    disabled={!selectedCountry || citiesLoading} // Disable the dropdown if loading or no country is selected
+                  >
+                    <SelectTrigger className="w-full text-black">
+                      <SelectValue placeholder="Select City" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        {citiesLoading && (
+                          <SelectItem value="-" disabled>
+                            Loading cities...
+                          </SelectItem>
+                        )}
+                        {citiesByCountry.length > 0 ? (
+                          citiesByCountry.map((city) => (
+                            <SelectItem key={city.id} value={String(city.id)}>
+                              {city.name}
+                            </SelectItem>
+                          ))
+                        ) : (
+                          <SelectItem value="-" disabled>
+                            No cities available
+                          </SelectItem>
+                        )}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
 
-              {/* City Selection */}
               <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="city">City</Label>
-                <Select
-                  value={selectedCity}
-                  onValueChange={(value) => setSelectedCity(value)}
-                  disabled={!selectedCountry || citiesLoading} // Disable the dropdown if loading or no country is selected
-                >
-                  <SelectTrigger className="w-full text-black">
-                    <SelectValue placeholder="Select City" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      {citiesLoading && (
-                        <SelectItem value="-" disabled>
-                          Loading cities...
-                        </SelectItem>
-                      )}
-                      {citiesByCountry.length > 0 ? (
-                        citiesByCountry.map((city) => (
-                          <SelectItem key={city.id} value={city.name}>
-                            {city.name}
-                          </SelectItem>
-                        ))
-                      ) : (
-                        <SelectItem value="-" disabled>
-                          No cities available
-                        </SelectItem>
-                      )}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
+                <Label htmlFor="profile-picture">Profile Picture</Label>
+                <Input id="profile-picture" type="file" />
               </div>
 
               <Input id="role" type="hidden" value={role!} />

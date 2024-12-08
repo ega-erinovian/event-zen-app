@@ -3,12 +3,6 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
 
-// Define the CityType
-interface CityType {
-  id: string;
-  name: string;
-}
-
 const useGetCitiesByCountry = (country: string) => {
   const [data, setData] = useState<CityType[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
