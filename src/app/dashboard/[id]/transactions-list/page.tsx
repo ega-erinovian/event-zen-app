@@ -1,5 +1,5 @@
 import DashboardLayout from "@/components/layouts/organizer/DashboardLayout";
-import TransactionsList from "@/features/dashboard/organizer/transactions-list";
+import TransactionsList from "@/features/dashboard/transaction/transactions-list";
 import React from "react";
 
 const OrganizerTransactionsList = () => {

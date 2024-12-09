@@ -42,17 +42,6 @@ import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
 import Link from "next/link";
 import { FC, useState, useEffect } from "react";
 
-interface EventType {
-  id: number;
-  category: { name: string };
-  title: string;
-  startDate: Date;
-  endDate: Date;
-  city: { name: string };
-  price: number;
-  availableSeats: number;
-}
-
 interface EventTableInterface {
   data: EventType[];
   isLoading: boolean;

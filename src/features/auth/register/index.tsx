@@ -12,8 +12,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import useGetCitiesByCountry from "@/hooks/city/getCitiesByCountry";
-import useGetCountries from "@/hooks/country/useGetCountries";
+import useGetCitiesByCountry from "@/hooks/api/city/getCitiesByCountry";
+import useGetCountries from "@/hooks/api/country/useGetCountries";
 import { useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 

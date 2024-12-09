@@ -1,6 +1,6 @@
 "use client";
 
-import useGetEvents from "@/hooks/event/useGetEvents";
+import useGetEvents from "@/hooks/api/event/useGetEvents";
 import EventTable from "./components/EventTable";
 
 const EventList = () => {
