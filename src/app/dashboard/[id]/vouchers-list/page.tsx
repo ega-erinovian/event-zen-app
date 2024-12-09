@@ -1,5 +1,5 @@
 import DashboardLayout from "@/components/layouts/organizer/DashboardLayout";
-import VouchersList from "@/features/dashboard/organizer/vouchers-list";
+import VouchersList from "@/features/dashboard/voucher/vouchers-list";
 
 const OrganizerVouchersList = () => {
   return (

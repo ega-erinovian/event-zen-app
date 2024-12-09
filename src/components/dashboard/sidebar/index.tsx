@@ -39,7 +39,7 @@ const items = [
     subitems: [
       {
         title: "Event List",
-        url: "/dashboard/organizer/1/event-list",
+        url: "/dashboard/1/event-list",
       },
     ],
   },
@@ -49,7 +49,7 @@ const items = [
     subitems: [
       {
         title: "Transaction List",
-        url: "/dashboard/organizer/1/transactions-list",
+        url: "/dashboard/1/transactions-list",
       },
     ],
   },
@@ -59,17 +59,17 @@ const items = [
     subitems: [
       {
         title: "Voucher List",
-        url: "/dashboard/organizer/1/vouchers-list",
+        url: "/dashboard/1/vouchers-list",
       },
       {
         title: "Create Voucher",
-        url: "/dashboard/organizer/1/create-voucher",
+        url: "/dashboard/1/create-voucher",
       },
     ],
   },
 ];
 
-export function OrganizerSidebar() {
+export function DashboardSidebar() {
   const pathname = usePathname();
 
   return (

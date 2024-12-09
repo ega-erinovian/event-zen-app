@@ -1,7 +1,5 @@
 import DashboardLayout from "@/components/layouts/organizer/DashboardLayout";
-import { SidebarTrigger } from "@/components/ui/sidebar";
-import Home from "@/features/dashboard/organizer/home";
-import React from "react";
+import Home from "@/features/dashboard/home";
 
 const Organizer = () => {
   return (
