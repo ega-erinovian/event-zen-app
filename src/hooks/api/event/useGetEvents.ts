@@ -1,5 +1,6 @@
 "use client";
 
+import { EventType } from "@/types/event";
 import axios from "axios";
 import { useState, useEffect } from "react";
 
