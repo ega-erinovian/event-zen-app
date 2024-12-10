@@ -1,6 +1,6 @@
 "use client";
 
-import useGetVouchers from "@/hooks/api/vouchers/useGetVouchers";
+import useGetVouchers from "@/hooks/api/voucher/useGetVouchers";
 import VoucherTable from "./components/VoucherTable";
 
 const VouchersList = () => {

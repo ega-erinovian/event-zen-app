@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { poppins } from "@/utils/font";
+import ReactQueryProvider from "@/providers/ReactQueryProviders";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export const metadata: Metadata = {
   title: "EventZen",
@@ -15,7 +18,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${poppins.className} antialiased`}>{children}</body>
+      <body className={`${poppins.className} antialiased`}>
+        <ReactQueryProvider>{children}</ReactQueryProvider>
+        <ToastContainer />
+      </body>
     </html>
   );
 }
