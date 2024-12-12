@@ -17,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
 import {
   Table,
   TableBody,
@@ -40,13 +41,26 @@ import {
 } from "@tanstack/react-table";
 import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
 import Link from "next/link";
-import { FC, useState, useEffect } from "react";
+import { FC, useState, useEffect, useMemo } from "react";
+
+// Event Type Interface
+interface EventType {
+  id: number;
+  category: { name: string };
+  title: string;
+  startDate: Date;
+  endDate: Date;
+  city: { name: string };
+  price: number;
+  availableSeats: number;
+}
 
 interface EventTableInterface {
   data: EventType[];
   isLoading: boolean;
 }
 
+// Column Definitions
 const columns: ColumnDef<EventType>[] = [
   {
     accessorKey: "id",
@@ -113,6 +127,7 @@ const columns: ColumnDef<EventType>[] = [
   },
 ];
 
+// Sortable Header Button Component
 const SortableHeaderButton: FC<{ column: any; label: string }> = ({
   column,
   label,
@@ -125,6 +140,7 @@ const SortableHeaderButton: FC<{ column: any; label: string }> = ({
   </Button>
 );
 
+// Date Formatter Cell Component
 const DateCell: FC<{ date: string }> = ({ date }) => {
   const formattedDate = new Intl.DateTimeFormat("en-ID", {
     dateStyle: "full",
@@ -134,12 +150,14 @@ const DateCell: FC<{ date: string }> = ({ date }) => {
   return <div className="capitalize">{formattedDate}</div>;
 };
 
+// Currency Formatter Cell Component
 const CurrencyCell: FC<{ value: number }> = ({ value }) => (
   <div>
     {value.toLocaleString("id-ID", { style: "currency", currency: "IDR" })}
   </div>
 );
 
+// Action Menu Component for Event Actions
 const ActionMenu: FC<{ row: any }> = ({ row }) => (
   <DropdownMenu>
     <DropdownMenuTrigger asChild>
@@ -149,23 +167,42 @@ const ActionMenu: FC<{ row: any }> = ({ row }) => (
       </Button>
     </DropdownMenuTrigger>
     <DropdownMenuContent align="end">
-      <Link href={`/organizer/1/edit-event?id=${row.original.id}`}>
+      <Link href={`/dashboard/1/event-attendee?id=${row.original.id}`}>
+        <DropdownMenuItem>Attendee List</DropdownMenuItem>
+      </Link>
+      <Separator />
+      <Link href={`/dashboard/1/edit-event?id=${row.original.id}`}>
         <DropdownMenuItem>Edit Event</DropdownMenuItem>
       </Link>
     </DropdownMenuContent>
   </DropdownMenu>
 );
 
+// Main EventTable Component
 const EventTable: FC<EventTableInterface> = ({ data, isLoading }) => {
-  const [sorting, setSorting] = useState<SortingState>([]);
+  // Default Sorting by ID (Descending)
+  const [sorting, setSorting] = useState<SortingState>([
+    { id: "id", desc: true },
+  ]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [globalFilter, setGlobalFilter] = useState("");
+  const [pagination, setPagination] = useState({
+    pageSize: 10, // default to 10 rows per page
+    pageIndex: 0, // default to the first page
+  });
 
+  // Memoized Table Configuration
   const table = useReactTable({
     data,
     columns,
-    state: { sorting, columnFilters, columnVisibility, globalFilter },
+    state: {
+      sorting,
+      columnFilters,
+      columnVisibility,
+      globalFilter,
+      pagination,
+    },
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
@@ -175,6 +212,14 @@ const EventTable: FC<EventTableInterface> = ({ data, isLoading }) => {
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
   });
+
+  const handlePageSizeChange = (size: number) => {
+    setPagination((prev) => ({
+      ...prev,
+      pageSize: size,
+      pageIndex: 0, // reset to the first page when page size changes
+    }));
+  };
 
   return (
     <div className="w-full">
@@ -186,11 +231,12 @@ const EventTable: FC<EventTableInterface> = ({ data, isLoading }) => {
         table={table}
       />
       <TableSection table={table} isLoading={isLoading} />
-      <PaginationControls table={table} />
+      <PaginationControls table={table} setPageSize={handlePageSizeChange} />
     </div>
   );
 };
 
+// Header Section Component with Filter and Sorting Options
 const HeaderSection: FC<{
   isLoading: boolean;
   data: EventType[];
@@ -198,8 +244,9 @@ const HeaderSection: FC<{
   setGlobalFilter: (value: string) => void;
   table: any;
 }> = ({ isLoading, data, globalFilter, setGlobalFilter, table }) => {
-  const categories = Array.from(
-    new Set(data.map((event) => event.category.name))
+  const categories = useMemo(
+    () => Array.from(new Set(data.map((event) => event.category.name))),
+    [data]
   );
 
   return (
@@ -215,23 +262,26 @@ const HeaderSection: FC<{
           className="max-w-sm w-[300px]"
         />
         <ColumnVisibilityDropdown table={table} />
-        <TimeCategoryFilters data={data} table={table} />
+        <TimeCategoryFilters
+          data={data}
+          table={table}
+          categories={categories}
+        />
       </div>
     </div>
   );
 };
 
-const TimeCategoryFilters: FC<{ data: EventType[]; table: any }> = ({
-  data,
-  table,
-}) => {
+// Time and Category Filters Component
+const TimeCategoryFilters: FC<{
+  data: EventType[];
+  table: any;
+  categories: string[];
+}> = ({ data, table, categories }) => {
   const [selectedTime, setSelectedTime] = useState("all-event");
   const [selectedCategory, setSelectedCategory] = useState("all");
 
-  const categories = Array.from(
-    new Set(data.map((event) => event.category.name))
-  );
-
+  // Apply Category Filter
   useEffect(() => {
     const newFilters =
       selectedCategory === "all"
@@ -275,6 +325,7 @@ const TimeCategoryFilters: FC<{ data: EventType[]; table: any }> = ({
   );
 };
 
+// Column Visibility Dropdown Component
 const ColumnVisibilityDropdown: FC<{ table: any }> = ({ table }) => (
   <DropdownMenu>
     <DropdownMenuTrigger asChild>
@@ -299,6 +350,7 @@ const ColumnVisibilityDropdown: FC<{ table: any }> = ({ table }) => (
   </DropdownMenu>
 );
 
+// Table Section Component
 const TableSection: FC<{ table: any; isLoading: boolean }> = ({
   table,
   isLoading,
@@ -340,7 +392,11 @@ const TableSection: FC<{ table: any; isLoading: boolean }> = ({
   </div>
 );
 
-const PaginationControls: FC<{ table: any }> = ({ table }) => (
+// Pagination Controls Component
+const PaginationControls: FC<{
+  table: any;
+  setPageSize: (size: number) => void;
+}> = ({ table, setPageSize }) => (
   <div className="flex justify-between py-4">
     <div className="flex gap-2">
       <Button
@@ -354,6 +410,21 @@ const PaginationControls: FC<{ table: any }> = ({ table }) => (
         Next
       </Button>
     </div>
+
+    {/* Rows per page select */}
+    <div className="flex items-center gap-2">
+      <span>Rows per page:</span>
+      <select
+        value={table.getState().pagination.pageSize}
+        onChange={(e) => setPageSize(Number(e.target.value))}
+        className="border p-1 rounded">
+        <option value={5}>5</option>
+        <option value={10}>10</option>
+        <option value={25}>25</option>
+        <option value={50}>50</option>
+      </select>
+    </div>
+
     <div className="text-sm">
       Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
     </div>

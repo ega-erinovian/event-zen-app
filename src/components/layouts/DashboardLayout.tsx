@@ -1,9 +1,9 @@
 "use client";
 
-import { DashboardSidebar } from "@/components/dashboard/sidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import React from "react";
 import { ReactNode } from "react";
+import DashboardSidebar from "../dashboard/DashboardSidebar";
 
 interface DashboardLayoutProps {
   children: ReactNode;

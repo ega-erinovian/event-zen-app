@@ -39,7 +39,7 @@ const items = [
     subitems: [
       {
         title: "Event List",
-        url: "/dashboard/1/event-list",
+        url: "/dashboard/events",
       },
     ],
   },
@@ -49,7 +49,7 @@ const items = [
     subitems: [
       {
         title: "Transaction List",
-        url: "/dashboard/1/transactions-list",
+        url: "/dashboard/transactions",
       },
     ],
   },
@@ -59,17 +59,17 @@ const items = [
     subitems: [
       {
         title: "Voucher List",
-        url: "/dashboard/1/vouchers-list",
+        url: "/dashboard/vouchers",
       },
       {
         title: "Create Voucher",
-        url: "/dashboard/1/create-voucher",
+        url: "/dashboard/vouchers/create-voucher",
       },
     ],
   },
 ];
 
-export function DashboardSidebar() {
+const DashboardSidebar = () => {
   const pathname = usePathname();
 
   return (
@@ -77,7 +77,7 @@ export function DashboardSidebar() {
       <SidebarContent className="pt-4 ps-2">
         <SidebarGroup>
           <SidebarGroupLabel className="text-2xl font-bold mb-4 ">
-            EventZen
+            EventIn
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -85,11 +85,11 @@ export function DashboardSidebar() {
                 <SidebarMenuButton
                   asChild
                   className={
-                    pathname === "/dashboard/organizer/1"
+                    pathname === "/dashboard/"
                       ? "bg-[#e8e9ea] hover:bg-[#d6d7d9]"
-                      : ""
+                      : "hover:bg-[#e8e9ea]"
                   }>
-                  <Link href="/dashboard/organizer/1">
+                  <Link href="/dashboard/">
                     <Layout />
                     <span className="font-semibold">Dashboard</span>
                   </Link>
@@ -117,9 +117,9 @@ export function DashboardSidebar() {
                             <Link href={subitem.url}>
                               <SidebarMenuButton
                                 className={
-                                  pathname === subitem.url
+                                  pathname && pathname === subitem.url
                                     ? "bg-[#e8e9ea] hover:bg-[#d6d7d9]"
-                                    : ""
+                                    : "hover:bg-[#e8e9ea]"
                                 }>
                                 <span>{subitem.title}</span>
                               </SidebarMenuButton>
@@ -138,7 +138,7 @@ export function DashboardSidebar() {
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem className="mb-2">
-            <Link href="/dashboard/organizer/1/profile">
+            <Link href="/dashboard/profile">
               <SidebarMenuButton asChild className="h-full">
                 <div className="flex items-center gap-4">
                   <div className="relative w-10 h-10 ">
@@ -149,14 +149,14 @@ export function DashboardSidebar() {
                       fill
                     />
                   </div>
-                  <span className="font-bold">Budi Marquees</span>
+                  <span className="font-bold">PK Entertainment</span>
                 </div>
               </SidebarMenuButton>
             </Link>
           </SidebarMenuItem>
           <SidebarMenuItem className="mb-2">
             <SidebarMenuButton asChild className="font-semibold">
-              <Link href="/dashboard/auth/login">
+              <Link href="/auth/login">
                 <LogOut />
                 <span>Logout</span>
               </Link>
@@ -166,4 +166,6 @@ export function DashboardSidebar() {
       </SidebarFooter>
     </Sidebar>
   );
-}
+};
+
+export default DashboardSidebar;
