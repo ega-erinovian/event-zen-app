@@ -1,40 +1,25 @@
 import { axiosInstance } from "@/lib/axios";
+import { EventType } from "@/types/event";
+import { PageableResponse, PaginationQueries } from "@/types/pagination";
 import { useQuery } from "@tanstack/react-query";
 
-const useGetEvents = () => {
-  // useQuery sudah otomatis melakukan caching
+interface GetEventsQuery extends PaginationQueries {
+  search?: string;
+  categoryId?: number;
+}
+
+const useGetEvents = (queries: GetEventsQuery) => {
   return useQuery({
-    queryKey: ["events"],
+    queryKey: ["events", queries],
     queryFn: async () => {
-      const { data } = await axiosInstance.get("/events");
+      const { data } = await axiosInstance.get<PageableResponse<EventType>>(
+        "/events",
+        { params: queries }
+      );
+
       return data;
     },
   });
 };
 
 export default useGetEvents;
-
-// const useGetEvents = () => {
-//   const [data, setData] = useState<EventType[]>([]);
-//   const [isLoading, setIsLoading] = useState(true);
-
-//   useEffect(() => {
-//     const fetchData = async () => {
-//       setIsLoading(true);
-//       try {
-//         const { data } = await axios.get("http://localhost:8000/events");
-//         setData(data);
-//       } catch (error) {
-//         console.error("Error fetching data:", error);
-//       } finally {
-//         setIsLoading(false);
-//       }
-//     };
-
-//     fetchData();
-//   }, []);
-
-//   return { data, isLoading };
-// };
-
-// export default useGetEvents;
