@@ -1,4 +1,4 @@
-export type EventType = {
+export interface EventType {
   id: number;
   title: string;
   description: string;
@@ -21,4 +21,4 @@ export type EventType = {
     id: number;
     name: string;
   };
-};
+}
