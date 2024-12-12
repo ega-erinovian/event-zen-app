@@ -1,4 +1,4 @@
-import DashboardLayout from "@/components/layouts/organizer/DashboardLayout";
+import DashboardLayout from "@/components/layouts/DashboardLayout";
 import Home from "@/features/dashboard/home";
 
 const Organizer = () => {

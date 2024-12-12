@@ -1,4 +1,4 @@
-import DashboardLayout from "@/components/layouts/organizer/DashboardLayout";
+import DashboardLayout from "@/components/layouts/DashboardLayout";
 import TransactionsList from "@/features/dashboard/transaction/transactions-list";
 import React from "react";
 
