@@ -19,7 +19,7 @@ import useCreateVoucher from "@/hooks/api/voucher/useCreateVoucher";
 import useGetEvents from "@/hooks/api/event/useGetEvents";
 import { useDebounce } from "use-debounce";
 
-const CreateVoucherComponent = () => {
+const CreateVoucherPage = () => {
   const { mutateAsync: createVoucher, isPending } = useCreateVoucher();
   const [selectedEvent, setSelectedEvent] = useState<string>("");
   const [open, setOpen] = useState(false);
@@ -191,4 +191,4 @@ const CreateVoucherComponent = () => {
   );
 };
 
-export default CreateVoucherComponent;
+export default CreateVoucherPage;
