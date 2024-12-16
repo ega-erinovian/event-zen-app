@@ -4,7 +4,6 @@ import { useQuery } from "@tanstack/react-query";
 
 interface GetVoucherQuery extends PaginationQueries {
   search?: string;
-  eventId?: number;
 }
 
 const useGetVouchers = (queries: GetVoucherQuery) => {

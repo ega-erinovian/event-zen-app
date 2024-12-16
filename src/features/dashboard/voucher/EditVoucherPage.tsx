@@ -165,7 +165,7 @@ const EditVoucherPage = ({ id }: EditVoucherPageProps) => {
   }
 
   if (isVoucherLoading || isEventsLoading || !isFormReady) {
-    return <Loading text="Loading Voucher Data..." />;
+    return <Loading text="Voucher Data..." />;
   }
 
   return (
