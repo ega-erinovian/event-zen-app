@@ -3,18 +3,18 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { toast } from "react-toastify";
 
-const useDeleteVoucher = () => {
+const useDeleteTransaction = () => {
   // const { axiosInstance } = useAxios();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (id: number) => {
-      const { data } = await axiosInstance.delete(`/vouchers/${id}`);
+      const { data } = await axiosInstance.delete(`/transactions/${id}`);
       return data;
     },
     onSuccess: async () => {
-      toast.success(`Voucher deleted successfully`);
-      await queryClient.invalidateQueries({ queryKey: ["vouchers"] });
+      toast.success(`Transaction deleted successfully`);
+      await queryClient.invalidateQueries({ queryKey: ["transactions"] });
     },
     onError: (error: AxiosError<any>) => {
       toast.error(error.response?.data);
@@ -22,4 +22,4 @@ const useDeleteVoucher = () => {
   });
 };
 
-export default useDeleteVoucher;
+export default useDeleteTransaction;
